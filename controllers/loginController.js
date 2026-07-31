@@ -1,21 +1,31 @@
 const User = require("../models/userSchema");
 
 const loginController = async (req, res) => {
-  const { email } = req.params;
-  const { otp } = req.body;
-  const existingUser = await User.findOne({ email: email });
+  try {
+    const { email } = req.params;
+    const { otp } = req.body;
+    const loggedUser = await User.findOne({ email: email });
 
-  if (!existingUser.isLogin) {
-    res.send("Age logout koro");
-  }
-  if (!existingUser.otp) {
-    res.send("Besi Calak");
-  }
-  if (existingUser.otp == otp) {
-    await User.findOneAndUpdate({ email: email }, { otp: "", isLogin: false });
-    return res.send("Login");
-  } else {
-    return res.send("OTP not match");
+    if (!loggedUser) {
+      return res.status(404).json("User not found");
+    }
+    if (loggedUser.isLogin) {
+      return res.status(400).json("Age log out kro");
+    }
+    if (!loggedUser.otp) {
+      return res.status(400).json("tokai hacker");
+    }
+    if (loggedUser.otp == otp) {
+      const loggedUser = await User.findOneAndUpdate(
+        { email: email },
+        { otp: "", isLogin: true },
+      );
+      return res.status(200).json("Login Successful");
+    } else {
+      return res.status(400).json("OTP not match muri khao");
+    }
+  } catch (error) {
+    return res.status(500).json("Intanal server error:" + error);
   }
 };
 

@@ -12,7 +12,7 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
-  isLogin:{
+  isLogin :{
     type: Boolean,
     default: false
   }

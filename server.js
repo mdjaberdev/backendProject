@@ -1,4 +1,4 @@
-require("node:dns").setServers(["1.1.1.1"], ["3.3.3.3"]);
+require("node:dns").setServers(["1.1.1.1"], ["8.8.8.8"]);
 require("dotenv").config();
 const express = require("express");
 const app = express();

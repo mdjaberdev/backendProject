@@ -1,7 +1,5 @@
 const otpGenerator = require("otp-generator");
 
-const otp = otpGenerator.generate(6);
-
 const htmlTemplete = (otp) => {
   return `<body style="margin:0; padding:0; background-color:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 

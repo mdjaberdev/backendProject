@@ -1,8 +1,8 @@
+const User = require("../models/userSchema");
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
-
-const User = require("../models/userSchema");
 const htmlTemplete = require("../utils/htmlTemplete");
+
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -15,42 +15,31 @@ const transporter = nodemailer.createTransport({
 });
 
 const otpController = async (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  if (!email) {
-    return res.status(400).json({
-      success: false,
-      message: "Email is required",
+    if (!email) {
+      return res.send("Email is Required");
+    }
+
+    const otp = otpGenerator.generate(6);
+    const info = await transporter.sendMail({
+      from: '"Example Team" mdjaber.dev@gmail.com', 
+      to: email,
+      subject: "Hello", 
+      text: "Hello world?", 
+      html: htmlTemplete(otp), 
     });
-  }
 
-  const otp = otpGenerator.generate(6);
-  const existingUser = await User.findOne({ email: email });
-  if (!existingUser) {
     const user = new User({
       email: email,
       otp: otp,
     });
-
-    user.save();
-  } else {
-    await User.findOneAndUpdate({ email: email }, { otp: otp });
+    await user.save();
+    res.send("Otp Send");
+  } catch (error) {
+    return res.status(500).json("Intanal server error" + error)
   }
-
-  
-  const info = await transporter.sendMail({
-    from: '"MD JABER" mdjaber.dev@gmail.com', 
-    to: email, 
-    subject: "This is your OTP", 
-    text: "Hello world?", 
-    html: htmlTemplete(otp), 
-  });
-
-  console.log("Message sent: %s", info.messageId);
-  res.send({
-    success: true,
-    message: "Send OTP Message"
-  });
 };
 
 module.exports = otpController;
