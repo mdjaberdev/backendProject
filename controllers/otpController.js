@@ -33,7 +33,7 @@ const otpController = async (req, res) => {
     }
 
     const info = await transporter.sendMail({
-      from: '"Example Team" mdjaber.dev@gmail.com',
+      from: '"MD JABER" mdjaber.dev@gmail.com',
       to: email,
       subject: "Hello",
       text: "Hello world?",
