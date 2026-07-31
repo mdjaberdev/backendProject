@@ -1,8 +1,9 @@
 const express = require("express");
-const router = express.Router();
+const otpController = require("../controllers/otpController");
+const loginController = require("../controllers/loginController");
+const _ = express.Router();
 
-router.get("/greeting", (req, res) => {
-  res.status(200).json("Hello Frontend Developer");
-});
+_.post("/sendotp", otpController);
+_.post("/login/:email", loginController);
 
-module.exports = router;
+module.exports = _;
