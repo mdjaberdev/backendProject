@@ -16,10 +16,10 @@ const userSchema = new Schema({
   password: {
     type: String,
   },
-  isLogin: {
-    type: Boolean,
-    default: false,
-  },
+  // isLogin: {
+  //   type: Boolean,
+  //   default: false,
+  // },
   role: {
     type: String,
     enum: ["student", "teacher", "management"],
