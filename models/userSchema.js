@@ -4,18 +4,30 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   email: {
     type: String,
-    required: true,
-    unique: true,
   },
-  otp: {
+  // otp: {
+  //   type: String,
+  //   required: true,
+  //   unique: true,
+  // },
+  userName: {
     type: String,
-    required: true,
-    unique: true,
   },
-  isLogin :{
+  password: {
+    type: String,
+  },
+  isLogin: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
+  role: {
+    type: String,
+    enum: ["student", "teacher", "management"],
+    default: "student",
+  },
+  permission: {
+    type: [String],
+  },
 });
 
 module.exports = mongoose.model("Userotp", userSchema);
