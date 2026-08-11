@@ -61,4 +61,25 @@ _.post("/login", async (req, res) => {
   });
 });
 
+function abc(req, res, next) {
+  let token = req.headers.authorization;
+  console.log(token.split(" ")[1]);
+
+  jwt.verify(
+    token.split(" ")[1],
+    process.env.JWT_SECRET_ACCESS,
+    function (err, decoded) {
+      if (decoded.role == "student") {
+        res.send("You don't access permission");
+      } else {
+        next();
+      }
+    },
+  );
+}
+
+_.get("/privatedata", abc, async (req, res) => {
+  res.send("private data");
+});
+
 module.exports = _;
