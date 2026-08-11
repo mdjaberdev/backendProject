@@ -17,69 +17,98 @@ const jwt = require("jsonwebtoken");
 // _.delete("/deleteProducts/:id", deleteProductsController);
 
 _.post("/registration", async (req, res) => {
-  let { userName, email, password, role } = req.body;
+  try {
+    let { userName, email, password, role } = req.body;
 
-  if (!role) {
-    role = "student";
-  }
-  let per;
-
-  permission.map((item) => {
-    if (item.role == role) {
-      per = item.permission;
+    if (!role) {
+      role = "student";
     }
-  });
-  const user = await new User({
-    userName: userName,
-    email: email,
-    password: password,
-    role: role,
-    permission: per,
-  }).save();
-  res.send({
-    data: user,
-  });
+    let per;
+
+    permission.map((item) => {
+      if (item.role == role) {
+        per = item.permission;
+      }
+    });
+    const user = await new User({
+      userName: userName,
+      email: email,
+      password: password,
+      role: role,
+      permission: per,
+    }).save();
+    res.status(201).json({
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Internal server error ${error}`,
+    });
+  }
 });
 
 _.post("/login", async (req, res) => {
-  const { email } = req.body;
-  const existingUser = await User.findOne({ email: email });
-  console.log(existingUser);
-  const token = jwt.sign(
-    {
-      _id: existingUser._id,
-      userName: existingUser.userName,
-      email: existingUser.email,
-      role: existingUser.role,
-      permission: existingUser.permission,
-    },
-    process.env.JWT_SECRET_ACCESS,
-    { expiresIn: "1h" },
-  );
-  res.json({
-    accessToken: token,
-  });
+  try {
+    const { email } = req.body;
+    const existingUser = await User.findOne({ email: email });
+    console.log(existingUser);
+    const token = jwt.sign(
+      {
+        _id: existingUser._id,
+        userName: existingUser.userName,
+        email: existingUser.email,
+        role: existingUser.role,
+        permission: existingUser.permission,
+      },
+      process.env.JWT_SECRET_ACCESS,
+      { expiresIn: "1h" },
+    );
+    res.status(200).json({
+      accessToken: token,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Internal server error ${error}`,
+    });
+  }
 });
 
 function abc(req, res, next) {
-  let token = req.headers.authorization;
-  console.log(token.split(" ")[1]);
-
-  jwt.verify(
-    token.split(" ")[1],
-    process.env.JWT_SECRET_ACCESS,
-    function (err, decoded) {
-      if (decoded.role == "student") {
-        res.send("You don't access permission");
-      } else {
-        next();
-      }
-    },
-  );
+  try {
+    let token = req.headers.authorization;
+    jwt.verify(
+      token.split(" ")[1],
+      process.env.JWT_SECRET_ACCESS,
+      function (err, decoded) {
+        if (decoded.role == "student") {
+          res.status(403).json("You don't access permission");
+        } else {
+          next();
+        }
+      },
+    );
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Internal server error ${error}`,
+    });
+  }
 }
 
 _.get("/privatedata", abc, async (req, res) => {
-  res.send("private data");
+  try {
+    res.status(200).json({
+      success: true,
+      message: "All private data",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Internal server error ${error}`,
+    });
+  }
 });
 
 module.exports = _;
