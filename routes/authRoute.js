@@ -7,8 +7,8 @@ const express = require("express");
 const User = require("../models/userSchema");
 const _ = express.Router();
 const upload = require("../utils/storage");
-
-const permission = require("../permission");
+const permission = require("../utils/permission");
+const jwt = require("jsonwebtoken");
 
 // _.post("/sendotp", otpController);
 // _.post("/login/:email", loginController);
@@ -18,19 +18,18 @@ const permission = require("../permission");
 
 _.post("/registration", async (req, res) => {
   let { userName, email, password, role } = req.body;
+
   if (!role) {
     role = "student";
-    
   }
   let per;
+
   permission.map((item) => {
     if (item.role == role) {
       per = item.permission;
     }
   });
-  console.log(per);
-
-  let user = await new User({
+  const user = await new User({
     userName: userName,
     email: email,
     password: password,
@@ -39,6 +38,26 @@ _.post("/registration", async (req, res) => {
   }).save();
   res.send({
     data: user,
+  });
+});
+
+_.post("/login", async (req, res) => {
+  const { email } = req.body;
+  const existingUser = await User.findOne({ email: email });
+  console.log(existingUser);
+  const token = jwt.sign(
+    {
+      _id: existingUser._id,
+      userName: existingUser.userName,
+      email: existingUser.email,
+      role: existingUser.role,
+      permission: existingUser.permission,
+    },
+    process.env.JWT_SECRET_ACCESS,
+    { expiresIn: "1h" },
+  );
+  res.json({
+    accessToken: token,
   });
 });
 

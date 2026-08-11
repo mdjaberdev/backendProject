@@ -1,4 +1,5 @@
 const permission = [
+    
   {
     role: "student",
     permission: [
@@ -17,4 +18,4 @@ const permission = [
   },
 ];
 
-module.exports = permission;
+module.exports = permission
